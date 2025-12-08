@@ -1,30 +1,27 @@
+using FiapCloud.Games.Api.Config;
+using FiapCloud.Games.Api.Middleware;
+using FiapCloud.Games.Infra.Messaging;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddDatabaseConfiguration(builder.Configuration)
+    .AddRepositoryConfiguration()
+    .AddMediatorConfiguration()
+    .AddSwaggerConfiguration();
 
 builder.Services.AddControllers();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("DefaultPolicy", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+builder.Services.AddHostedService<RabbitMqConsumer>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseSwaggerConfiguration(app.Environment);
 
 app.UseHttpsRedirection();
-app.UseCors("DefaultPolicy");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

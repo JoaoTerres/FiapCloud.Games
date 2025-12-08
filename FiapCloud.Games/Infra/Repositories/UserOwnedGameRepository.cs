@@ -16,11 +16,6 @@ public class UserOwnedGameRepository : IUserOwnedGameRepository
         _ownedGames = _context.Set<UserOwnedGame>();
     }
 
-    public async Task<UserOwnedGame?> GetByIdAsync(Guid id)
-    {
-        return await _ownedGames.FirstOrDefaultAsync(o => o.Id == id);
-    }
-
     public async Task<IEnumerable<UserOwnedGame>> GetByUserIdAsync(Guid userId)
     {
         return await _ownedGames
@@ -31,13 +26,6 @@ public class UserOwnedGameRepository : IUserOwnedGameRepository
     public async Task AddAsync(UserOwnedGame ownedGame)
     {
         await _ownedGames.AddAsync(ownedGame);
-    }
-
-    public async Task RemoveAsync(Guid id)
-    {
-        var ownedGame = await GetByIdAsync(id);
-        if (ownedGame != null)
-            _ownedGames.Remove(ownedGame);
     }
 
     public async Task<int> SaveChangesAsync() =>
